@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Test Widget',
       theme: ThemeData(
         // This is the theme of your application.
@@ -34,7 +35,8 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
           body: TestWidget(
-        text: "Какой-то текст",
+        text:
+            "Какой-то текст ececececsecsecseccccccccccccccccccccccccccccccccccccccccccccc",
         valueCheckBox: true,
       )),
     );

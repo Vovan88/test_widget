@@ -10,74 +10,70 @@ class TestWidget extends StatefulWidget {
   State<TestWidget> createState() => _TestWidgetState();
 }
 
-class _TestWidgetState extends State<TestWidget> with WidgetsBindingObserver {
+class _TestWidgetState extends State<TestWidget> {
   final GlobalKey globalKey = GlobalKey();
-  ValueNotifier<bool> valueNotifierVisible = ValueNotifier(true);
-  double w = 0;
+  final GlobalKey globalChexBox = GlobalKey();
+  final GlobalKey globalText = GlobalKey();
+
+  double wLine = 0;
+  double wCheckBox = 0;
+  double wText = 0;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      w = _getwidth(globalKey.currentContext);
-
-      valueNotifierVisible.value = w > 10;
-    });
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: valueNotifierVisible,
-        builder: (c, val, _) {
-          return Row(
-            children: [
-              Expanded(
-                  flex: val ? 0 : 1,
-                  child: Text(widget.text, overflow: TextOverflow.ellipsis)),
-              Expanded(
-                child: Visibility(
-                  visible: val,
-                  maintainState: true,
-                  child: DottedLine(
-                    key: globalKey,
-                    direction: Axis.horizontal,
-                    alignment: WrapAlignment.center,
-                    lineLength: double.infinity,
-                    lineThickness: 1.0,
-                    dashLength: 4.0,
-                    dashColor: Colors.black,
-                    dashRadius: 0.0,
-                    dashGapLength: 4.0,
-                    dashGapRadius: 0.0,
+    return LayoutBuilder(builder: (context, constraints) {
+      wLine = _getwidth(globalKey.currentContext);
+      wCheckBox = _getwidth(globalChexBox.currentContext);
+      wText = _getwidth(globalText.currentContext);
+      return Row(
+        children: [
+          Expanded(
+            flex: wText + wCheckBox <= constraints.maxWidth - 10 ? 0 : 1,
+            child: Text(
+              key: globalText,
+              widget.text,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          wText + wCheckBox >= constraints.maxWidth - 10
+              ? const SizedBox(
+                  width: 10,
+                )
+              : Expanded(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 10),
+                    child: DottedLine(
+                      key: globalKey,
+                      direction: Axis.horizontal,
+                      alignment: WrapAlignment.center,
+                      lineLength: double.infinity,
+                      lineThickness: 1.0,
+                      dashLength: 4.0,
+                      dashColor: Colors.black,
+                      dashRadius: 0.0,
+                      dashGapLength: 4.0,
+                      dashGapRadius: 0.0,
+                    ),
                   ),
                 ),
-              ),
-              Checkbox(
-                  value: widget.valueCheckBox,
-                  onChanged: (val) {
-                    setState(() {
-                      if (val != null) {
-                        widget.valueCheckBox = val;
-                      }
-                    });
-                  })
-            ],
-          );
-        });
-  }
-
-  @override
-  void didChangeMetrics() {
-    w = _getwidth(globalKey.currentContext);
-
-    valueNotifierVisible.value = w > 10;
+          Checkbox(
+              key: globalChexBox,
+              value: widget.valueCheckBox,
+              onChanged: (val) {
+                setState(() {
+                  if (val != null) {
+                    widget.valueCheckBox = val;
+                  }
+                });
+              })
+        ],
+      );
+    });
   }
 
   _getwidth(c) {
